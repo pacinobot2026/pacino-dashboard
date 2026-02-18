@@ -107,9 +107,63 @@ function useMoney(end: number, duration: number = 2000, startDelay: number = 0) 
   return amount;
 }
 
+// Calculate next cron job time
+function getNextCronTime(schedule: string, now: Date): Date {
+  const next = new Date(now);
+  
+  if (schedule.includes('Every 30min')) {
+    const mins = next.getMinutes();
+    const nextMins = mins < 30 ? 30 : 60;
+    next.setMinutes(nextMins, 0, 0);
+    if (nextMins === 60) {
+      next.setMinutes(0);
+      next.setHours(next.getHours() + 1);
+    }
+  } else if (schedule.includes('8:00 AM')) {
+    next.setHours(8, 0, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+  } else if (schedule.includes('10am & 4pm')) {
+    const hour = now.getHours();
+    if (hour < 10) {
+      next.setHours(10, 0, 0, 0);
+    } else if (hour < 16) {
+      next.setHours(16, 0, 0, 0);
+    } else {
+      next.setDate(next.getDate() + 1);
+      next.setHours(10, 0, 0, 0);
+    }
+  } else if (schedule.includes('2am')) {
+    next.setHours(2, 0, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+  } else if (schedule.includes('Real-time')) {
+    next.setMinutes(next.getMinutes() + 1, 0, 0);
+  } else if (schedule.includes('Weekly')) {
+    next.setDate(next.getDate() + 7);
+  }
+  
+  return next;
+}
+
+function formatCountdown(ms: number): string {
+  if (ms <= 0) return "NOW!";
+  
+  const seconds = Math.floor(ms / 1000) % 60;
+  const minutes = Math.floor(ms / 60000) % 60;
+  const hours = Math.floor(ms / 3600000);
+  
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  } else if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  } else {
+    return `${seconds}s`;
+  }
+}
+
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loaded, setLoaded] = useState(false);
+  const [nextJob, setNextJob] = useState<{ name: string; schedule: string; timeLeft: number } | null>(null);
 
   useEffect(() => {
     setTimeout(() => setLoaded(true), 100);
@@ -185,7 +239,28 @@ export default function Dashboard() {
   ];
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+      
+      // Calculate next cron job
+      let nearest: { name: string; schedule: string; time: Date } | null = null;
+      
+      cronJobs.filter(j => j.status === 'active').forEach(job => {
+        const nextTime = getNextCronTime(job.schedule, now);
+        if (!nearest || nextTime < nearest.time) {
+          nearest = { name: job.name, schedule: job.schedule, time: nextTime };
+        }
+      });
+      
+      if (nearest) {
+        setNextJob({
+          name: nearest.name,
+          schedule: nearest.schedule,
+          timeLeft: nearest.time.getTime() - now.getTime()
+        });
+      }
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -229,6 +304,30 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Next Cron Job Banner */}
+        {nextJob && (
+          <div className={`mb-6 ${loaded ? 'animate-fadeInUp delay-100' : 'opacity-0'}`}>
+            <div className="bg-gradient-to-r from-cyan-900/50 via-blue-900/50 to-purple-900/50 rounded-xl p-4 border border-cyan-500/30 animate-pulseGlow">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="text-2xl animate-bounceSoft">⏰</div>
+                  <div>
+                    <div className="text-xs text-cyan-400 uppercase tracking-wide">Next Cron Job</div>
+                    <div className="font-bold text-lg">{nextJob.name}</div>
+                    <div className="text-xs text-gray-400">{nextJob.schedule}</div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-gray-400 uppercase tracking-wide">Runs In</div>
+                  <div className={`text-2xl md:text-3xl font-mono font-bold tabular-nums ${nextJob.timeLeft < 60000 ? 'text-red-400 animate-numberFlash' : 'text-cyan-400'}`}>
+                    {formatCountdown(nextJob.timeLeft)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats Bar */}
         <div className={`grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6 ${loaded ? 'animate-fadeInUp delay-200' : 'opacity-0'}`}>
