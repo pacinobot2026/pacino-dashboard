@@ -154,45 +154,21 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* API Keys Connected */}
-            <Section title="API Keys Connected" icon="🔑">
-              <div className="space-y-4">
-                {/* AI Providers */}
-                <div>
-                  <div className="text-xs text-cyan-400 font-medium mb-2">AI Providers</div>
-                  <div className="space-y-2">
-                    {aiApiKeys.map((key, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
-                          <div>
-                            <div className="font-medium">{key.provider}</div>
-                            <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
-                          </div>
-                        </div>
-                        <StatusBadge status={key.status} />
+            {/* API Keys Connected (AI Providers Only) */}
+            <Section title="AI API Keys" icon="🔑">
+              <div className="space-y-2">
+                {aiApiKeys.map((key, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <div>
+                        <div className="font-medium">{key.provider}</div>
+                        <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
                       </div>
-                    ))}
+                    </div>
+                    <StatusBadge status={key.status} />
                   </div>
-                </div>
-
-                {/* 3rd Party Integrations */}
-                <div>
-                  <div className="text-xs text-purple-400 font-medium mb-2">3rd Party Integrations</div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {integrationKeys.map((key, i) => (
-                      <div key={i} className="flex items-center justify-between p-2 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
-                          <div>
-                            <div className="font-medium text-sm">{key.provider}</div>
-                            <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                ))}
               </div>
             </Section>
 
@@ -308,6 +284,23 @@ export default function Dashboard() {
                     </div>
                     <div className={`px-2 py-1 rounded text-xs ${channel.status === 'connected' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                       {channel.status}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            {/* 3rd Party Integrations */}
+            <Section title="3rd Party Integrations" icon="🔌">
+              <div className="space-y-2">
+                {integrationKeys.map((key, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <div>
+                        <div className="font-medium text-sm">{key.provider}</div>
+                        <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
+                      </div>
                     </div>
                   </div>
                 ))}
