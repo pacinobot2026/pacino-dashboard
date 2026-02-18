@@ -180,20 +180,24 @@ export default function Dashboard() {
     // Initial calculation
     const calcNext = () => {
       const now = new Date();
-      let nearest: { name: string; schedule: string; time: Date } | null = null;
       
-      cronJobs.filter(j => j.status === 'active').forEach(job => {
+      // Find the next cron job
+      const activeJobs = cronJobs.filter(j => j.status === 'active');
+      let nearestJob: { name: string; schedule: string; time: Date } | null = null;
+      
+      for (const job of activeJobs) {
         const nextTime = getNextCronTime(job.schedule, now);
-        if (!nearest || nextTime < nearest.time) {
-          nearest = { name: job.name, schedule: job.schedule, time: nextTime };
+        if (!nearestJob || nextTime < nearestJob.time) {
+          nearestJob = { name: job.name, schedule: job.schedule, time: nextTime };
         }
-      });
+      }
       
-      if (nearest) {
+      if (nearestJob !== null) {
+        const jobInfo = nearestJob;
         setNextJob({
-          name: nearest.name,
-          schedule: nearest.schedule,
-          timeLeft: nearest.time.getTime() - now.getTime()
+          name: jobInfo.name,
+          schedule: jobInfo.schedule,
+          timeLeft: jobInfo.time.getTime() - now.getTime()
         });
       }
       setCurrentTime(now);
