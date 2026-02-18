@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ModelInfo {
   name: string;
@@ -40,56 +40,69 @@ interface ApiSpend {
 }
 
 // Animated counter hook
-function useAnimatedCounter(end: number, duration: number = 1500) {
+function useCounter(end: number, duration: number = 1500, startDelay: number = 0) {
   const [count, setCount] = useState(0);
-  const countRef = useRef(0);
+  const [started, setStarted] = useState(false);
   
   useEffect(() => {
-    const startTime = Date.now();
-    const startValue = 0;
+    const delayTimer = setTimeout(() => setStarted(true), startDelay);
+    return () => clearTimeout(delayTimer);
+  }, [startDelay]);
+  
+  useEffect(() => {
+    if (!started) return;
     
-    const animate = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      const currentValue = Math.floor(startValue + (end - startValue) * easeOutQuart);
-      
-      setCount(currentValue);
-      countRef.current = currentValue;
+    let startTime: number;
+    let animationFrame: number;
+    
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(end * easeOut));
       
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrame = requestAnimationFrame(animate);
       }
     };
     
-    requestAnimationFrame(animate);
-  }, [end, duration]);
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration, started]);
   
   return count;
 }
 
-// Animated money counter
-function useAnimatedMoney(end: number, duration: number = 2000) {
+// Animated money hook
+function useMoney(end: number, duration: number = 2000, startDelay: number = 0) {
   const [amount, setAmount] = useState(0);
+  const [started, setStarted] = useState(false);
   
   useEffect(() => {
-    const startTime = Date.now();
+    const delayTimer = setTimeout(() => setStarted(true), startDelay);
+    return () => clearTimeout(delayTimer);
+  }, [startDelay]);
+  
+  useEffect(() => {
+    if (!started) return;
     
-    const animate = () => {
-      const now = Date.now();
-      const progress = Math.min((now - startTime) / duration, 1);
-      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-      const currentValue = end * easeOutQuart;
-      
-      setAmount(currentValue);
+    let startTime: number;
+    let animationFrame: number;
+    
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setAmount(end * easeOut);
       
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrame = requestAnimationFrame(animate);
       }
     };
     
-    requestAnimationFrame(animate);
-  }, [end, duration]);
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration, started]);
   
   return amount;
 }
@@ -99,7 +112,7 @@ export default function Dashboard() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setLoaded(true);
+    setTimeout(() => setLoaded(true), 100);
   }, []);
 
   // API Keys - AI Providers
@@ -183,31 +196,32 @@ export default function Dashboard() {
   };
 
   // Animated counters
-  const modelCount = useAnimatedCounter(models.length);
-  const integrationCount = useAnimatedCounter(integrationKeys.length);
-  const cronCount = useAnimatedCounter(cronJobs.length);
-  const channelCount = useAnimatedCounter(channels.length);
-  const totalSpend = useAnimatedMoney(17.52);
+  const modelCount = useCounter(models.length, 1000, 200);
+  const integrationCount = useCounter(integrationKeys.length, 1000, 300);
+  const cronCount = useCounter(cronJobs.length, 1000, 400);
+  const channelCount = useCounter(channels.length, 1000, 500);
+  const totalSpend = useMoney(17.52, 2000, 600);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white p-4 md:p-8 overflow-hidden">
-      {/* Animated background glow */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      {/* Animated background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl animate-float delay-500" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl animate-float delay-1000" />
       </div>
 
       {/* Header */}
       <div className="max-w-7xl mx-auto relative">
-        <div className={`flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 transition-all duration-1000 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+        <div className={`flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 ${loaded ? 'animate-fadeInUp' : 'opacity-0'}`}>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient bg-300%">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
               OpenClaw — Personal AI Agent
             </h1>
             <p className="text-gray-400 mt-1 text-sm md:text-base">Full Configuration Overview</p>
           </div>
           <div className="text-left md:text-right">
-            <div className="text-xl md:text-2xl font-mono text-cyan-400 tabular-nums animate-pulse">
+            <div className="text-xl md:text-2xl font-mono text-cyan-400 tabular-nums animate-numberFlash">
               {currentTime.toLocaleTimeString()}
             </div>
             <div className="text-gray-500 text-xs md:text-sm">
@@ -216,30 +230,32 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Bar - Mobile Responsive */}
-        <div className={`grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6 transition-all duration-1000 delay-200 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <StatCard label="AI Models" value={modelCount} icon="🧠" delay={0} />
-          <StatCard label="Integrations" value={integrationCount} icon="🔌" delay={100} />
-          <StatCard label="Cron Jobs" value={cronCount} icon="⏰" delay={200} />
-          <StatCard label="Channels" value={channelCount} icon="📡" delay={300} />
-          <StatCard label="Session Life" value="365d" icon="♾️" delay={400} />
+        {/* Stats Bar */}
+        <div className={`grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6 ${loaded ? 'animate-fadeInUp delay-200' : 'opacity-0'}`}>
+          <StatCard label="AI Models" value={modelCount} icon="🧠" />
+          <StatCard label="Integrations" value={integrationCount} icon="🔌" />
+          <StatCard label="Cron Jobs" value={cronCount} icon="⏰" />
+          <StatCard label="Channels" value={channelCount} icon="📡" />
+          <StatCard label="Session Life" value="365d" icon="♾️" isText />
         </div>
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* API Keys Connected (AI Providers Only) */}
-            <Section title="AI API Keys" icon="🔑" delay={300}>
+            {/* API Keys */}
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInLeft delay-300' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>🔑</span> AI API Keys
+              </h2>
               <div className="space-y-2">
                 {aiApiKeys.map((key, i) => (
                   <div 
                     key={i} 
-                    className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
-                    style={{ animationDelay: `${i * 100}ms` }}
+                    className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/10"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500 animate-statusPulse' : 'bg-red-500'}`} />
                       <div>
                         <div className="font-medium">{key.provider}</div>
                         <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
@@ -249,28 +265,33 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            </Section>
+            </div>
 
             {/* API Spend */}
-            <Section title="API Spend (This Month)" icon="💰" delay={400}>
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInLeft delay-400' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>💰</span> API Spend (This Month)
+              </h2>
               <div className="space-y-3">
                 {apiSpend.map((spend, i) => (
-                  <AnimatedSpendBar key={i} spend={spend} delay={i * 200} />
+                  <SpendBar key={i} spend={spend} delay={i * 300 + 800} loaded={loaded} />
                 ))}
                 <div className="text-right text-sm text-gray-400 pt-2 border-t border-gray-700">
-                  Total: <span className="text-cyan-400 font-medium">${totalSpend.toFixed(2)}</span> / $80.00
+                  Total: <span className="text-cyan-400 font-medium animate-numberFlash">${totalSpend.toFixed(2)}</span> / $80.00
                 </div>
               </div>
-            </Section>
+            </div>
 
             {/* AI Model Stack */}
-            <Section title="AI Model Stack" icon="🧠" delay={500}>
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInLeft delay-500' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>🧠</span> AI Model Stack
+              </h2>
               <div className="space-y-2">
                 {models.map((model, i) => (
                   <div 
                     key={i} 
-                    className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02] animate-fadeIn"
-                    style={{ animationDelay: `${i * 100}ms` }}
+                    className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 hover:bg-gray-800/70 transition-all duration-300 hover:scale-[1.02]"
                   >
                     <div>
                       <div className="font-medium">{model.name}</div>
@@ -280,45 +301,45 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            </Section>
+            </div>
 
-            {/* Automated Cron Jobs */}
-            <Section title="Automated Cron Jobs" icon="⏰" delay={600}>
+            {/* Cron Jobs */}
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInLeft delay-600' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>⏰</span> Automated Cron Jobs
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {cronJobs.map((job, i) => (
-                  <div 
-                    key={i} 
-                    className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02]"
-                  >
+                  <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300">
                     <div>
                       <div className="font-medium text-sm">{job.name}</div>
                       <div className="text-xs text-gray-500">{job.schedule}</div>
                     </div>
-                    <div className={`w-2 h-2 rounded-full ${job.status === 'active' ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`} />
+                    <div className={`w-2 h-2 rounded-full ${job.status === 'active' ? 'bg-green-500 animate-statusPulse' : 'bg-yellow-500'}`} />
                   </div>
                 ))}
               </div>
-            </Section>
+            </div>
           </div>
 
           {/* Right Column */}
           <div className="space-y-6">
             {/* Tasks */}
-            <Section title="Tasks" icon="📋" delay={350}>
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInRight delay-300' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>📋</span> Tasks
+              </h2>
               <div className="space-y-4">
-                {/* In Progress */}
                 {tasksByStatus.inProgress.length > 0 && (
                   <div>
                     <div className="text-xs text-yellow-400 font-medium mb-2 flex items-center gap-1">
-                      <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span> In Progress ({tasksByStatus.inProgress.length})
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full animate-statusPulse"></span> In Progress ({tasksByStatus.inProgress.length})
                     </div>
                     {tasksByStatus.inProgress.map((task, i) => (
                       <TaskItem key={i} task={task} />
                     ))}
                   </div>
                 )}
-                
-                {/* Backlog */}
                 <div>
                   <div className="text-xs text-gray-400 font-medium mb-2 flex items-center gap-1">
                     <span className="w-2 h-2 bg-gray-400 rounded-full"></span> Backlog ({tasksByStatus.backlog.length})
@@ -327,26 +348,24 @@ export default function Dashboard() {
                     {tasksByStatus.backlog.slice(0, 5).map((task, i) => (
                       <TaskItem key={i} task={task} />
                     ))}
-                    {tasksByStatus.backlog.length > 5 && (
-                      <div className="text-xs text-gray-500 pl-2">+{tasksByStatus.backlog.length - 5} more...</div>
-                    )}
                   </div>
                 </div>
-
-                {/* Done */}
                 <div>
                   <div className="text-xs text-green-400 font-medium mb-2 flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> Done ({tasksByStatus.done.length})
+                    <span className="w-2 h-2 bg-green-400 rounded-full animate-statusPulse"></span> Done ({tasksByStatus.done.length})
                   </div>
                   {tasksByStatus.done.slice(0, 3).map((task, i) => (
                     <TaskItem key={i} task={task} />
                   ))}
                 </div>
               </div>
-            </Section>
+            </div>
 
             {/* Channels */}
-            <Section title="Connected Channels" icon="📡" delay={450}>
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInRight delay-400' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>📡</span> Connected Channels
+              </h2>
               <div className="space-y-2">
                 {channels.map((channel, i) => (
                   <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300">
@@ -354,24 +373,24 @@ export default function Dashboard() {
                       <div className="font-medium">{channel.name}</div>
                       <div className="text-xs text-gray-500">{channel.type}</div>
                     </div>
-                    <div className={`px-2 py-1 rounded text-xs ${channel.status === 'connected' ? 'bg-green-500/20 text-green-400 animate-pulse' : 'bg-red-500/20 text-red-400'}`}>
+                    <div className={`px-2 py-1 rounded text-xs ${channel.status === 'connected' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                       {channel.status}
                     </div>
                   </div>
                 ))}
               </div>
-            </Section>
+            </div>
 
-            {/* 3rd Party Integrations */}
-            <Section title="3rd Party Integrations" icon="🔌" delay={550}>
+            {/* Integrations */}
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInRight delay-500' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>🔌</span> 3rd Party Integrations
+              </h2>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {integrationKeys.map((key, i) => (
-                  <div 
-                    key={i} 
-                    className="flex items-center justify-between p-2 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-[1.02]"
-                  >
+                  <div key={i} className="flex items-center justify-between p-2 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 hover:scale-[1.02]">
                     <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500 animate-statusPulse' : 'bg-red-500'}`} />
                       <div>
                         <div className="font-medium text-sm">{key.provider}</div>
                         <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
@@ -380,26 +399,25 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
-            </Section>
+            </div>
 
-            {/* Key Features */}
-            <Section title="Key Features" icon="⚡" delay={650}>
+            {/* Features */}
+            <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 ${loaded ? 'animate-slideInRight delay-600' : 'opacity-0'}`}>
+              <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
+                <span>⚡</span> Key Features
+              </h2>
               <div className="flex flex-wrap gap-2">
                 {features.map((feature, i) => (
-                  <span 
-                    key={i} 
-                    className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-xs text-cyan-400 hover:bg-cyan-500/20 hover:scale-105 transition-all duration-300 cursor-default"
-                    style={{ animationDelay: `${i * 100}ms` }}
-                  >
+                  <span key={i} className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-xs text-cyan-400 hover:bg-cyan-500/20 hover:scale-105 transition-all duration-300 cursor-default">
                     {feature}
                   </span>
                 ))}
               </div>
-            </Section>
+            </div>
 
-            {/* Claw Graphic */}
-            <div className={`bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-6 border border-gray-700/50 text-center hover:border-cyan-500/30 transition-all duration-500 ${loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`} style={{ transitionDelay: '700ms' }}>
-              <div className="text-6xl mb-4 animate-bounce">🦞</div>
+            {/* Logo */}
+            <div className={`bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl p-6 border border-gray-700/50 text-center ${loaded ? 'animate-scaleIn delay-700' : 'opacity-0'}`}>
+              <div className="text-6xl mb-4 animate-bounceSoft">🦞</div>
               <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 OpenClaw
               </div>
@@ -411,75 +429,22 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Custom styles for animations */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes gradient {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-        
-        .animate-gradient {
-          animation: gradient 3s ease infinite;
-        }
-        
-        .bg-300\% {
-          background-size: 300% 300%;
-        }
-        
-        .delay-1000 {
-          animation-delay: 1000ms;
-        }
-      `}</style>
     </main>
   );
 }
 
-// Components
-function StatCard({ label, value, icon, delay }: { label: string; value: string | number; icon: string; delay: number }) {
-  const [visible, setVisible] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
+function StatCard({ label, value, icon, isText }: { label: string; value: string | number; icon: string; isText?: boolean }) {
   return (
-    <div className={`bg-gray-800/50 rounded-xl p-3 md:p-4 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-500 hover:scale-105 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+    <div className="bg-gray-800/50 rounded-xl p-3 md:p-4 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-105 animate-pulseGlow">
       <div className="flex items-center gap-2 md:gap-3">
         <div className="text-xl md:text-2xl">{icon}</div>
         <div>
-          <div className="text-xl md:text-2xl font-bold text-cyan-400 tabular-nums">{value}</div>
+          <div className={`text-xl md:text-2xl font-bold text-cyan-400 tabular-nums ${!isText ? 'animate-numberFlash' : ''}`}>
+            {value}
+          </div>
           <div className="text-xs text-gray-500">{label}</div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Section({ title, icon, children, delay }: { title: string; icon: string; children: React.ReactNode; delay: number }) {
-  const [visible, setVisible] = useState(false);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  return (
-    <div className={`bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50 hover:border-gray-600/50 transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-      <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
-        <span>{icon}</span> {title}
-      </h2>
-      {children}
     </div>
   );
 }
@@ -493,7 +458,7 @@ function StatusBadge({ status }: { status: string }) {
     missing: 'bg-red-500/20 text-red-400 border-red-500/30',
   };
   return (
-    <span className={`px-2 py-1 rounded text-xs border ${styles[status] || styles.available} transition-all duration-300`}>
+    <span className={`px-2 py-1 rounded text-xs border ${styles[status] || styles.available}`}>
       {status}
     </span>
   );
@@ -520,23 +485,23 @@ function TaskItem({ task }: { task: Task }) {
   );
 }
 
-function AnimatedSpendBar({ spend, delay }: { spend: ApiSpend; delay: number }) {
+function SpendBar({ spend, delay, loaded }: { spend: ApiSpend; delay: number; loaded: boolean }) {
   const [width, setWidth] = useState(0);
-  const animatedSpent = useAnimatedMoney(spend.spent, 2000 + delay);
+  const amount = useMoney(spend.spent, 1500, delay);
   
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setWidth(spend.percent);
-    }, 500 + delay);
-    return () => clearTimeout(timer);
-  }, [spend.percent, delay]);
+    if (loaded) {
+      const timer = setTimeout(() => setWidth(spend.percent), delay);
+      return () => clearTimeout(timer);
+    }
+  }, [spend.percent, delay, loaded]);
 
   return (
     <div className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50 hover:border-cyan-500/30 transition-all duration-300">
       <div className="flex justify-between mb-2">
         <span className="font-medium">{spend.provider}</span>
         <span className="text-sm">
-          <span className="text-cyan-400 tabular-nums">${animatedSpent.toFixed(2)}</span>
+          <span className="text-cyan-400 tabular-nums">${amount.toFixed(2)}</span>
           <span className="text-gray-500"> / ${spend.limit.toFixed(2)}</span>
         </span>
       </div>
