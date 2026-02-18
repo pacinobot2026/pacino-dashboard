@@ -20,10 +20,54 @@ interface Channel {
   status: 'connected' | 'disconnected';
 }
 
+interface ApiKey {
+  provider: string;
+  status: 'connected' | 'missing';
+  masked: string;
+}
+
+interface Task {
+  title: string;
+  status: 'backlog' | 'in-progress' | 'done';
+  priority?: 'high' | 'med' | 'low';
+}
+
+interface ApiSpend {
+  provider: string;
+  spent: string;
+  limit: string;
+  percent: number;
+}
+
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Configuration data - in production this would come from API
+  // API Keys - show what's connected (masked)
+  const apiKeys: ApiKey[] = [
+    { provider: 'Anthropic', status: 'connected', masked: 'sk-ant-•••••hKTgAA' },
+    { provider: 'Moonshot', status: 'connected', masked: 'sk-•••••3Kx9' },
+    { provider: 'OpenAI', status: 'connected', masked: 'sk-•••••Qw2m' },
+  ];
+
+  // API Spend tracking
+  const apiSpend: ApiSpend[] = [
+    { provider: 'Anthropic', spent: '$12.47', limit: '$50.00', percent: 25 },
+    { provider: 'Moonshot', spent: '$3.20', limit: '$20.00', percent: 16 },
+    { provider: 'OpenAI', spent: '$1.85', limit: '$10.00', percent: 19 },
+  ];
+
+  // Tasks from Kanban
+  const tasks: Task[] = [
+    { title: 'OpenClaw containers (Gaurav & Pranay)', status: 'backlog', priority: 'high' },
+    { title: 'Brian Anderson NDA offer', status: 'backlog', priority: 'high' },
+    { title: 'OpenClaw ads', status: 'backlog', priority: 'high' },
+    { title: 'OpenClaw webinar', status: 'in-progress', priority: 'high' },
+    { title: 'JV script for Zoo launch', status: 'backlog', priority: 'med' },
+    { title: 'Model switching command', status: 'done' },
+    { title: 'Dashboard redesign', status: 'done' },
+  ];
+
+  // Configuration data
   const models: ModelInfo[] = [
     { name: 'Claude Opus 4.5', provider: 'Anthropic', status: 'active' },
     { name: 'Kimi K2.5', provider: 'Moonshot', status: 'active' },
@@ -60,27 +104,33 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
+  const tasksByStatus = {
+    backlog: tasks.filter(t => t.status === 'backlog'),
+    inProgress: tasks.filter(t => t.status === 'in-progress'),
+    done: tasks.filter(t => t.status === 'done'),
+  };
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white p-8">
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white p-4 md:p-8">
       {/* Header */}
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
               OpenClaw — Personal AI Agent
             </h1>
-            <p className="text-gray-400 mt-1">Full Configuration Overview</p>
+            <p className="text-gray-400 mt-1 text-sm md:text-base">Full Configuration Overview</p>
           </div>
-          <div className="text-right">
-            <div className="text-2xl font-mono text-cyan-400">{currentTime.toLocaleTimeString()}</div>
-            <div className="text-gray-500 text-sm">
+          <div className="text-left md:text-right">
+            <div className="text-xl md:text-2xl font-mono text-cyan-400">{currentTime.toLocaleTimeString()}</div>
+            <div className="text-gray-500 text-xs md:text-sm">
               {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             </div>
           </div>
         </div>
 
-        {/* Stats Bar */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        {/* Stats Bar - Mobile Responsive */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
           <StatCard label="AI Models" value={models.length} icon="🧠" />
           <StatCard label="Cron Jobs" value={cronJobs.length} icon="⏰" />
           <StatCard label="Channels" value={channels.length} icon="📡" />
@@ -91,6 +141,50 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
+            {/* API Keys Connected */}
+            <Section title="API Keys Connected" icon="🔑">
+              <div className="space-y-2">
+                {apiKeys.map((key, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <div>
+                        <div className="font-medium">{key.provider}</div>
+                        <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
+                      </div>
+                    </div>
+                    <StatusBadge status={key.status} />
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            {/* API Spend */}
+            <Section title="API Spend (This Month)" icon="💰">
+              <div className="space-y-3">
+                {apiSpend.map((spend, i) => (
+                  <div key={i} className="p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                    <div className="flex justify-between mb-2">
+                      <span className="font-medium">{spend.provider}</span>
+                      <span className="text-sm">
+                        <span className="text-cyan-400">{spend.spent}</span>
+                        <span className="text-gray-500"> / {spend.limit}</span>
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full transition-all"
+                        style={{ width: `${spend.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <div className="text-right text-sm text-gray-400 pt-2 border-t border-gray-700">
+                  Total: <span className="text-cyan-400 font-medium">$17.52</span> / $80.00
+                </div>
+              </div>
+            </Section>
+
             {/* AI Model Stack */}
             <Section title="AI Model Stack" icon="🧠">
               <div className="space-y-2">
@@ -108,7 +202,7 @@ export default function Dashboard() {
 
             {/* Automated Cron Jobs */}
             <Section title="Automated Cron Jobs" icon="⏰">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {cronJobs.map((job, i) => (
                   <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
                     <div>
@@ -124,6 +218,48 @@ export default function Dashboard() {
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* Tasks */}
+            <Section title="Tasks" icon="📋">
+              <div className="space-y-4">
+                {/* In Progress */}
+                {tasksByStatus.inProgress.length > 0 && (
+                  <div>
+                    <div className="text-xs text-yellow-400 font-medium mb-2 flex items-center gap-1">
+                      <span className="w-2 h-2 bg-yellow-400 rounded-full"></span> In Progress ({tasksByStatus.inProgress.length})
+                    </div>
+                    {tasksByStatus.inProgress.map((task, i) => (
+                      <TaskItem key={i} task={task} />
+                    ))}
+                  </div>
+                )}
+                
+                {/* Backlog */}
+                <div>
+                  <div className="text-xs text-gray-400 font-medium mb-2 flex items-center gap-1">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full"></span> Backlog ({tasksByStatus.backlog.length})
+                  </div>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {tasksByStatus.backlog.slice(0, 5).map((task, i) => (
+                      <TaskItem key={i} task={task} />
+                    ))}
+                    {tasksByStatus.backlog.length > 5 && (
+                      <div className="text-xs text-gray-500 pl-2">+{tasksByStatus.backlog.length - 5} more...</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Done */}
+                <div>
+                  <div className="text-xs text-green-400 font-medium mb-2 flex items-center gap-1">
+                    <span className="w-2 h-2 bg-green-400 rounded-full"></span> Done ({tasksByStatus.done.length})
+                  </div>
+                  {tasksByStatus.done.slice(0, 3).map((task, i) => (
+                    <TaskItem key={i} task={task} />
+                  ))}
+                </div>
+              </div>
+            </Section>
+
             {/* Channels */}
             <Section title="Connected Channels" icon="📡">
               <div className="space-y-2">
@@ -173,11 +309,11 @@ export default function Dashboard() {
 // Components
 function StatCard({ label, value, icon }: { label: string; value: string | number; icon: string }) {
   return (
-    <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-      <div className="flex items-center gap-3">
-        <div className="text-2xl">{icon}</div>
+    <div className="bg-gray-800/50 rounded-xl p-3 md:p-4 border border-gray-700/50">
+      <div className="flex items-center gap-2 md:gap-3">
+        <div className="text-xl md:text-2xl">{icon}</div>
         <div>
-          <div className="text-2xl font-bold text-cyan-400">{value}</div>
+          <div className="text-xl md:text-2xl font-bold text-cyan-400">{value}</div>
           <div className="text-xs text-gray-500">{label}</div>
         </div>
       </div>
@@ -187,8 +323,8 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
 
 function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
-    <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-700/50">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+    <div className="bg-gray-900/50 rounded-xl p-4 md:p-6 border border-gray-700/50">
+      <h2 className="text-base md:text-lg font-semibold mb-4 flex items-center gap-2">
         <span>{icon}</span> {title}
       </h2>
       {children}
@@ -197,14 +333,37 @@ function Section({ title, icon, children }: { title: string; icon: string; child
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const styles = {
+  const styles: Record<string, string> = {
     active: 'bg-green-500/20 text-green-400 border-green-500/30',
     available: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     offline: 'bg-red-500/20 text-red-400 border-red-500/30',
+    connected: 'bg-green-500/20 text-green-400 border-green-500/30',
+    missing: 'bg-red-500/20 text-red-400 border-red-500/30',
   };
   return (
-    <span className={`px-2 py-1 rounded text-xs border ${styles[status as keyof typeof styles] || styles.available}`}>
+    <span className={`px-2 py-1 rounded text-xs border ${styles[status] || styles.available}`}>
       {status}
     </span>
+  );
+}
+
+function TaskItem({ task }: { task: Task }) {
+  const priorityColors: Record<string, string> = {
+    high: 'text-red-400',
+    med: 'text-yellow-400',
+    low: 'text-gray-400',
+  };
+  
+  return (
+    <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded text-sm">
+      <span className={task.status === 'done' ? 'line-through text-gray-500' : ''}>
+        {task.title}
+      </span>
+      {task.priority && (
+        <span className={`text-xs ${priorityColors[task.priority]}`}>
+          [{task.priority}]
+        </span>
+      )}
+    </div>
   );
 }
