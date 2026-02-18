@@ -42,11 +42,23 @@ interface ApiSpend {
 export default function Dashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // API Keys - show what's connected (masked)
-  const apiKeys: ApiKey[] = [
+  // API Keys - AI Providers
+  const aiApiKeys: ApiKey[] = [
     { provider: 'Anthropic', status: 'connected', masked: 'sk-ant-•••••hKTgAA' },
     { provider: 'Moonshot', status: 'connected', masked: 'sk-•••••3Kx9' },
     { provider: 'OpenAI', status: 'connected', masked: 'sk-•••••Qw2m' },
+  ];
+
+  // API Keys - 3rd Party Integrations
+  const integrationKeys: ApiKey[] = [
+    { provider: 'Zoom', status: 'connected', masked: 'eyJ•••••Rk2' },
+    { provider: 'Vimeo', status: 'connected', masked: '8f3•••••a91' },
+    { provider: 'MintBird / PopLinks', status: 'connected', masked: 'z12•••••huW' },
+    { provider: 'Global Control', status: 'connected', masked: 'gc-•••••x7k' },
+    { provider: 'Course Sprout', status: 'connected', masked: 'cs-•••••m3p' },
+    { provider: 'Letterman', status: 'connected', masked: 'lm-•••••q2n' },
+    { provider: 'SaaSOnboard', status: 'connected', masked: 'sob-•••••f4j' },
+    { provider: 'AgentMail', status: 'connected', masked: 'am-•••••k8w' },
   ];
 
   // API Spend tracking
@@ -130,8 +142,9 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Bar - Mobile Responsive */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-6">
           <StatCard label="AI Models" value={models.length} icon="🧠" />
+          <StatCard label="Integrations" value={integrationKeys.length} icon="🔌" />
           <StatCard label="Cron Jobs" value={cronJobs.length} icon="⏰" />
           <StatCard label="Channels" value={channels.length} icon="📡" />
           <StatCard label="Session Life" value="365d" icon="♾️" />
@@ -143,19 +156,43 @@ export default function Dashboard() {
           <div className="lg:col-span-2 space-y-6">
             {/* API Keys Connected */}
             <Section title="API Keys Connected" icon="🔑">
-              <div className="space-y-2">
-                {apiKeys.map((key, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
-                      <div>
-                        <div className="font-medium">{key.provider}</div>
-                        <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
+              <div className="space-y-4">
+                {/* AI Providers */}
+                <div>
+                  <div className="text-xs text-cyan-400 font-medium mb-2">AI Providers</div>
+                  <div className="space-y-2">
+                    {aiApiKeys.map((key, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <div>
+                            <div className="font-medium">{key.provider}</div>
+                            <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
+                          </div>
+                        </div>
+                        <StatusBadge status={key.status} />
                       </div>
-                    </div>
-                    <StatusBadge status={key.status} />
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* 3rd Party Integrations */}
+                <div>
+                  <div className="text-xs text-purple-400 font-medium mb-2">3rd Party Integrations</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {integrationKeys.map((key, i) => (
+                      <div key={i} className="flex items-center justify-between p-2 bg-gray-800/50 rounded-lg border border-gray-700/50">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${key.status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <div>
+                            <div className="font-medium text-sm">{key.provider}</div>
+                            <div className="text-xs text-gray-500 font-mono">{key.masked}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </Section>
 
