@@ -165,6 +165,45 @@ export default function Dashboard() {
   const [loaded, setLoaded] = useState(false);
   const [nextJob, setNextJob] = useState<{ name: string; schedule: string; timeLeft: number } | null>(null);
 
+  // Define cronJobs FIRST so it's available for useEffect
+  const cronJobs: CronJob[] = [
+    { name: 'Morning Briefing', schedule: '8:00 AM daily', status: 'active' },
+    { name: 'Health Check', schedule: '10am & 4pm', status: 'active' },
+    { name: 'Heartbeat Poll', schedule: 'Every 30min', status: 'active' },
+    { name: 'Memory Backup', schedule: 'Daily 2am', status: 'active' },
+    { name: 'Email Watch', schedule: 'Real-time', status: 'active' },
+    { name: 'Update Check', schedule: 'Weekly', status: 'paused' },
+  ];
+
+  // Timer effect - now cronJobs is in scope
+  useEffect(() => {
+    // Initial calculation
+    const calcNext = () => {
+      const now = new Date();
+      let nearest: { name: string; schedule: string; time: Date } | null = null;
+      
+      cronJobs.filter(j => j.status === 'active').forEach(job => {
+        const nextTime = getNextCronTime(job.schedule, now);
+        if (!nearest || nextTime < nearest.time) {
+          nearest = { name: job.name, schedule: job.schedule, time: nextTime };
+        }
+      });
+      
+      if (nearest) {
+        setNextJob({
+          name: nearest.name,
+          schedule: nearest.schedule,
+          timeLeft: nearest.time.getTime() - now.getTime()
+        });
+      }
+      setCurrentTime(now);
+    };
+    
+    calcNext(); // Run immediately
+    const timer = setInterval(calcNext, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   useEffect(() => {
     setTimeout(() => setLoaded(true), 100);
   }, []);
@@ -215,15 +254,6 @@ export default function Dashboard() {
     { name: 'Claude Haiku 3.5', provider: 'Anthropic', status: 'available' },
   ];
 
-  const cronJobs: CronJob[] = [
-    { name: 'Morning Briefing', schedule: '8:00 AM daily', status: 'active' },
-    { name: 'Health Check', schedule: '10am & 4pm', status: 'active' },
-    { name: 'Heartbeat Poll', schedule: 'Every 30min', status: 'active' },
-    { name: 'Memory Backup', schedule: 'Daily 2am', status: 'active' },
-    { name: 'Email Watch', schedule: 'Real-time', status: 'active' },
-    { name: 'Update Check', schedule: 'Weekly', status: 'paused' },
-  ];
-
   const channels: Channel[] = [
     { name: 'Telegram', type: 'Primary', status: 'connected' },
     { name: 'Discord', type: 'Community', status: 'connected' },
@@ -237,32 +267,6 @@ export default function Dashboard() {
     'Skill System',
     'Cron Scheduling',
   ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(now);
-      
-      // Calculate next cron job
-      let nearest: { name: string; schedule: string; time: Date } | null = null;
-      
-      cronJobs.filter(j => j.status === 'active').forEach(job => {
-        const nextTime = getNextCronTime(job.schedule, now);
-        if (!nearest || nextTime < nearest.time) {
-          nearest = { name: job.name, schedule: job.schedule, time: nextTime };
-        }
-      });
-      
-      if (nearest) {
-        setNextJob({
-          name: nearest.name,
-          schedule: nearest.schedule,
-          timeLeft: nearest.time.getTime() - now.getTime()
-        });
-      }
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   const tasksByStatus = {
     backlog: tasks.filter(t => t.status === 'backlog'),
