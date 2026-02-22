@@ -22,7 +22,7 @@ export function NavigationSidebar() {
 
   return (
     <div 
-      className={`h-full bg-gray-900 border-r border-gray-800 flex flex-col transition-all duration-300 ${
+      className={`min-h-screen h-full bg-gray-900 border-r border-gray-800 flex flex-col transition-all duration-300 ${
         isExpanded ? 'w-48' : 'w-14'
       }`}
       onMouseEnter={() => setIsExpanded(true)}
