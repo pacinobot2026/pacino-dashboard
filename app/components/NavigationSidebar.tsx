@@ -10,7 +10,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'team', label: 'Team Board', icon: '👥', href: '/' },
+  { id: 'team', label: 'Team Board', icon: '👥', href: 'https://kanban-rho-ivory.vercel.app' },
   { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: '/openclaw' },
   { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app' },
   { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
