@@ -310,6 +310,12 @@ export default function Dashboard() {
             <div className="text-gray-500 text-xs md:text-sm">
               {currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             </div>
+            <a 
+              href="/commands" 
+              className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-500 rounded-lg text-xs transition-colors"
+            >
+              🎬 Command Center →
+            </a>
           </div>
         </div>
 
