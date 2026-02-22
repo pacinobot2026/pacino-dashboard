@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface NavItem {
   id: string;
@@ -10,15 +10,24 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
+  { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app/dashboard' },
+  { id: 'articles', label: 'Article Board', icon: '📰', href: 'https://vizard-clips-app.vercel.app/articles' },
+  { id: 'ideas', label: 'Idea Board', icon: '💡', href: 'https://vizard-clips-app.vercel.app/ideas' },
+  { id: 'control', label: 'Command Center', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
   { id: 'team', label: 'Team Board', icon: '👥', href: 'https://kanban-rho-ivory.vercel.app' },
-  { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: '/openclaw' },
-  { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app' },
-  { id: 'control', label: 'Control Panel', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
+  { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: 'https://vizard-clips-app.vercel.app/openclaw' },
 ];
 
 export function NavigationSidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [currentPath, setCurrentPath] = useState('');
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentPath(window.location.pathname);
+    }
+  }, []);
 
   return (
     <div 
@@ -27,18 +36,19 @@ export function NavigationSidebar() {
       }`}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
+      style={{ minHeight: '100vh', background: '#111827', borderRight: '1px solid #1f2937' }}
     >
       {/* Toggle Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="p-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+        className="p-3 text-gray-400 hover:text-white transition-colors"
       >
         <svg 
           className="w-5 h-5" 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
-          style={{ transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)' }}
+          style={{ transform: isExpanded ? 'rotate(0deg)' : 'rotate(180deg)', transition: 'transform 0.3s' }}
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
         </svg>
@@ -52,9 +62,11 @@ export function NavigationSidebar() {
             href={item.href}
             target={item.href.startsWith('http') ? '_blank' : undefined}
             rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-            className={`relative flex items-center gap-3 px-3 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors group ${
-              item.id === 'team' ? 'bg-purple-900/30 border-r-2 border-purple-500' : ''
-            }`}
+            className="relative flex items-center gap-3 px-3 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors group"
+            style={{
+              background: currentPath === item.href ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+              borderRight: currentPath === item.href ? '2px solid #8b5cf6' : 'none'
+            }}
             onMouseEnter={() => setHoveredItem(item.id)}
             onMouseLeave={() => setHoveredItem(null)}
           >
@@ -70,10 +82,32 @@ export function NavigationSidebar() {
 
             {/* Tooltip - shown when collapsed and hovered */}
             {!isExpanded && hoveredItem === item.id && (
-              <div className="absolute left-full ml-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg whitespace-nowrap z-50 shadow-lg border border-gray-700">
+              <div style={{
+                position: 'absolute',
+                left: '100%',
+                marginLeft: '8px',
+                padding: '8px 12px',
+                background: '#1f2937',
+                color: '#fff',
+                fontSize: '14px',
+                borderRadius: '8px',
+                whiteSpace: 'nowrap',
+                zIndex: 50,
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #374151'
+              }}>
                 {item.label}
-                {/* Arrow */}
-                <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 border-4 border-transparent border-r-gray-800" />
+                <div style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: '50%',
+                  transform: 'translate(-4px, -50%)',
+                  width: 0,
+                  height: 0,
+                  borderTop: '4px solid transparent',
+                  borderBottom: '4px solid transparent',
+                  borderRight: '4px solid #1f2937'
+                }} />
               </div>
             )}
           </a>
