@@ -10,15 +10,16 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'video', label: 'Video Board', icon: '🎬', href: 'https://vizard-clips-app.vercel.app/dashboard' },
-  { id: 'articles', label: 'Article Board', icon: '📰', href: 'https://vizard-clips-app.vercel.app/articles' },
-  { id: 'ideas', label: 'Idea Board', icon: '💡', href: 'https://vizard-clips-app.vercel.app/ideas' },
-  { id: 'bookmarks', label: 'Bookmarks', icon: '📑', href: 'https://vizard-clips-app.vercel.app/bookmarks' },
-  { id: 'shopping', label: 'Shopping/Watch', icon: '🛒', href: 'https://vizard-clips-app.vercel.app/shopping' },
-  { id: 'projects', label: 'Projects', icon: '📂', href: 'https://vizard-clips-app.vercel.app/projects' },
-  { id: 'control', label: 'Command Center', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
+  { id: 'command-center', label: 'OpenClaw Command Center', icon: '🎛️', href: 'https://dashboard-gilt-one-zc4y5uu95v.vercel.app' },
+  { id: 'custom-commands', label: 'Custom Command Engine', icon: '⚙️', href: '#' },
   { id: 'team', label: 'Team Board', icon: '👥', href: 'https://kanban-rho-ivory.vercel.app' },
-  { id: 'openclaw', label: 'OpenClaw Board', icon: '🤖', href: 'https://vizard-clips-app.vercel.app/openclaw' },
+  { id: 'projects', label: 'Project Board', icon: '📋', href: 'https://vizard-clips-app.vercel.app/projects' },
+  { id: 'articles', label: 'Article Board', icon: '📰', href: 'https://vizard-clips-app.vercel.app/articles' },
+  { id: 'video', label: 'Video Cue System', icon: '🎬', href: 'https://vizard-clips-app.vercel.app/dashboard' },
+  { id: 'ideas', label: 'Idea Board', icon: '💡', href: 'https://vizard-clips-app.vercel.app/ideas' },
+  { id: 'wishlist', label: 'Wish List', icon: '⭐', href: '#' },
+  { id: 'resources', label: 'Resource Library', icon: '📚', href: '#' },
+  { id: 'bookmarks', label: 'Bookmark Manager', icon: '🔖', href: 'https://vizard-clips-app.vercel.app/bookmarks' },
 ];
 
 export function NavigationSidebar() {
