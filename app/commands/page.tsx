@@ -350,7 +350,7 @@ export default function CommandsPage() {
                     <img 
                       src={cmd.logo} 
                       alt="" 
-                      className="absolute bottom-4 right-4 w-8 h-8 opacity-60"
+                      className="absolute bottom-4 right-4 w-8 h-8"
                     />
                   )}
                   
