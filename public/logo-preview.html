@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Logo Placement Preview</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #030712 0%, #111827 50%, #000000 100%);
+      padding: 40px;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: white;
+    }
+    .card {
+      background: rgba(17, 24, 39, 0.5);
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 400px;
+      position: relative;
+      margin: 20px auto;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+    .command-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #60a5fa;
+      font-family: monospace;
+    }
+    .badge {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .description {
+      color: #d1d5db;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .logo {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 32px;
+      height: 32px;
+      opacity: 0.6;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Logo Placement Preview</h1>
+  
+  <div class="card">
+    <div class="card-header">
+      <code class="command-name">/broadcast</code>
+      <span class="badge">📧 Email</span>
+    </div>
+    <p class="description">Create and send broadcast email via Global Control</p>
+    <img src="/logos/globalcontrol.png" class="logo" alt="Global Control" />
+  </div>
+
+  <div style="text-align: center; margin-top: 40px; color: #9ca3af;">
+    Logo appears in <strong>bottom right corner</strong> at 32×32px, slightly transparent
+  </div>
+</body>
+</html>

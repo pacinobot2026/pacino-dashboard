@@ -9,6 +9,7 @@ interface Command {
   description: string;
   steps: string[];
   shortcut?: string;
+  logo?: string;
 }
 
 const commands: Command[] = [
@@ -39,7 +40,8 @@ const commands: Command[] = [
       'YES → Pull from GC segments (Inactive→New→Passive→Dead)',
       'NO → Send test → Wait for "send it"'
     ],
-    shortcut: 'Type "/broadcast" or say "write me an email"'
+    shortcut: 'Type "/broadcast" or say "write me an email"',
+    logo: '/logos/globalcontrol.png'
   },
   {
     name: '/emailstats',
@@ -50,7 +52,8 @@ const commands: Command[] = [
       'Ask for date or date range',
       'Pull stats from GC API',
       'Show: Subject, Sent, Opens, Clicks'
-    ]
+    ],
+    logo: '/logos/globalcontrol.png'
   },
   {
     name: '/reactivation',
@@ -65,7 +68,8 @@ const commands: Command[] = [
       'Progressive daily sending via cron jobs',
       'Kanban board tracking',
       'Pause/Resume/Cancel anytime'
-    ]
+    ],
+    logo: '/logos/globalcontrol.png'
   },
   {
     name: '/replay',
@@ -107,7 +111,8 @@ const commands: Command[] = [
       'Create via PopLinks API',
       '✅ NEVER ask for domain or slug'
     ],
-    shortcut: 'Just paste the URL you want to shorten'
+    shortcut: 'Just paste the URL you want to shorten',
+    logo: '/logos/mintbird.png'
   },
   {
     name: '/leadstep',
@@ -120,7 +125,8 @@ const commands: Command[] = [
       'Ask for URL slug',
       'Create via PopLinks API',
       'Set up confirmation page'
-    ]
+    ],
+    logo: '/logos/mintbird.png'
   },
   {
     name: '/bridgepage',
@@ -134,7 +140,8 @@ const commands: Command[] = [
       'Ask for domain + slug',
       'Create/clone via PopLinks API',
       'Update headline, video if needed'
-    ]
+    ],
+    logo: '/logos/mintbird.png'
   },
   {
     name: '/tag',
@@ -146,7 +153,8 @@ const commands: Command[] = [
       'Ask which tag to fire',
       'Fire tag via GC API',
       'Confirm success'
-    ]
+    ],
+    logo: '/logos/globalcontrol.png'
   },
   {
     name: '/bulkimport',
@@ -160,7 +168,8 @@ const commands: Command[] = [
       '  - If new → Create contact + fire tag',
       'Generate detailed report with stats',
       'CSV format: email, firstName, lastName'
-    ]
+    ],
+    logo: '/logos/globalcontrol.png'
   },
   {
     name: '/contact',
@@ -171,7 +180,8 @@ const commands: Command[] = [
       'Ask for email',
       'Search GC for contact',
       'Show full history: tags, emails, activity, purchases'
-    ]
+    ],
+    logo: '/logos/globalcontrol.png'
   },
   {
     name: '/sob',
@@ -324,7 +334,7 @@ export default function CommandsPage() {
             {filteredCommands.map((cmd) => (
               <div
                 key={cmd.name}
-                className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer"
+                className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-600 transition-all cursor-pointer relative"
                 onClick={() => setExpandedCommand(expandedCommand === cmd.name ? null : cmd.name)}
               >
                 <div className="p-5">
@@ -335,6 +345,14 @@ export default function CommandsPage() {
                     </span>
                   </div>
                   <p className="text-gray-300 text-sm mb-3">{cmd.description}</p>
+                  
+                  {cmd.logo && (
+                    <img 
+                      src={cmd.logo} 
+                      alt="" 
+                      className="absolute bottom-4 right-4 w-8 h-8 opacity-60"
+                    />
+                  )}
                   
                   {cmd.shortcut && (
                     <div className="text-xs text-gray-500 mb-3">
