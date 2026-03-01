@@ -5,13 +5,28 @@ import { NavigationSidebar } from '../components/NavigationSidebar';
 
 interface Command {
   name: string;
-  category: 'email' | 'content' | 'links' | 'contacts' | 'system';
+  category: 'business' | 'email' | 'content' | 'links' | 'contacts' | 'system';
   description: string;
   steps: string[];
   shortcut?: string;
 }
 
 const commands: Command[] = [
+  {
+    name: '/create business',
+    category: 'business',
+    description: 'PRODUCT CREATION ENGINE — Full 6-stage revenue mode from idea to scale',
+    steps: [
+      'STAGE 1: Generate 10 opportunities with scoring',
+      'STAGE 2: Build business blueprint',
+      'STAGE 3: Build product + sales page + VSL + Stripe',
+      'STAGE 4: Create traffic assets (organic + paid + email)',
+      'STAGE 5: Deploy traffic + launch ads',
+      'STAGE 6: Optimization + scale plan',
+      '✅ Updates Business Board throughout process'
+    ],
+    shortcut: 'Type "/create business" to start full product creation'
+  },
   {
     name: '/broadcast',
     category: 'email',
@@ -27,16 +42,29 @@ const commands: Command[] = [
     shortcut: 'Type "/broadcast" or say "write me an email"'
   },
   {
+    name: '/emailstats',
+    category: 'email',
+    description: 'Get email performance stats from Global Control',
+    steps: [
+      'Ask: Broadcast or Workflow?',
+      'Ask for date or date range',
+      'Pull stats from GC API',
+      'Show: Subject, Sent, Opens, Clicks'
+    ]
+  },
+  {
     name: '/reactivation',
     category: 'email',
-    description: 'Long-term progressive campaign from CSV file',
+    description: 'Long-term progressive campaign from CSV file (not instant broadcast)',
     steps: [
       'Ask how many contacts',
       'Ask pace (Mild/Normal/Aggressive)',
       'Upload CSV/XLS file',
       'Verify emails (EmailListVerify)',
       'Choose GC tag + workflow',
-      'Progressive daily sending via cron'
+      'Progressive daily sending via cron jobs',
+      'Kanban board tracking',
+      'Pause/Resume/Cancel anytime'
     ]
   },
   {
@@ -45,102 +73,158 @@ const commands: Command[] = [
     description: 'Create Course Sprout lesson from Vimeo video',
     steps: [
       'Ask for Vimeo URL',
-      'Download transcript',
-      'Create lesson with descriptions',
-      'Add goal block (10 pts, comments)'
+      'Ask for lesson title (or auto-generate)',
+      'Download transcript from Vimeo API',
+      'Create lesson with short + long descriptions (NO EMOJIS)',
+      'Add goal block (10 pts, comments, user input)',
+      'Defaults: Course 340, Chapter 958'
     ]
   },
   {
     name: '/article',
     category: 'content',
-    description: 'Create Letterman article',
+    description: 'Create Letterman article with full workflow',
     steps: [
       'Ask: Blank or AI-generated?',
       'Ask: Local or Niche?',
       'Ask: Word count',
-      'Generate image if needed',
-      'Create as DRAFT (never auto-publish)'
+      'Ask: Image URL or generate?',
+      'If AI: Generate content from topic/URL',
+      'If Local: Apply local SEO strategy',
+      'Create as DRAFT with proper formatting',
+      'Update SEO settings',
+      '⚠️ WAIT for "publish" — never auto-publish'
     ]
   },
   {
     name: '/poplink',
     category: 'links',
-    description: 'Create shortened PopLink',
+    description: 'Create shortened PopLink (auto-generates slug + domain)',
     steps: [
-      'User gives destination URL',
-      'Auto-use chadnicely.com domain',
-      'Auto-generate slug',
-      'Create via API'
-    ]
+      'User gives destination URL ONLY',
+      'Auto-use chadnicely.com domain (ID: 1977)',
+      'Auto-generate simple slug',
+      'Create via PopLinks API',
+      '✅ NEVER ask for domain or slug'
+    ],
+    shortcut: 'Just paste the URL you want to shorten'
   },
   {
     name: '/leadstep',
     category: 'links',
-    description: 'Create lead capture page',
+    description: 'Create lead capture page in PopLinks',
     steps: [
       'Ask for page name',
       'Ask for headline/offer',
-      'Ask for domain/slug',
-      'Create via PopLinks API'
+      'Ask for domain (default: chadnicely.com)',
+      'Ask for URL slug',
+      'Create via PopLinks API',
+      'Set up confirmation page'
     ]
   },
   {
     name: '/bridgepage',
     category: 'links',
-    description: 'Create/clone bridge page',
+    description: 'Create or clone bridge page in PopLinks',
     steps: [
-      'Ask: Clone or create new?',
-      'Get source/details',
-      'Set destination URL',
-      'Create/clone via API'
+      'Ask: Clone existing or create new?',
+      'If clone: Ask for source page ID/name',
+      'Ask for new name',
+      'Ask for destination URL',
+      'Ask for domain + slug',
+      'Create/clone via PopLinks API',
+      'Update headline, video if needed'
     ]
   },
   {
     name: '/tag',
     category: 'contacts',
-    description: 'Fire tag on contact in GC',
+    description: 'Fire a tag on a contact in Global Control',
     steps: [
       'Ask for contact name',
       'Ask for email',
-      'Ask which tag',
-      'Fire via GC API'
+      'Ask which tag to fire',
+      'Fire tag via GC API',
+      'Confirm success'
+    ]
+  },
+  {
+    name: '/bulkimport',
+    category: 'contacts',
+    description: 'Bulk import contacts from CSV and tag them (creates if needed)',
+    steps: [
+      'Ask for CSV file',
+      'Ask for tag name',
+      'For each contact in CSV:',
+      '  - If exists → Fire tag (update)',
+      '  - If new → Create contact + fire tag',
+      'Generate detailed report with stats',
+      'CSV format: email, firstName, lastName'
     ]
   },
   {
     name: '/contact',
     category: 'contacts',
-    description: 'Get contact history from GC',
+    description: 'Get contact history from Global Control',
     steps: [
-      'Ask for name + email',
-      'Search GC',
-      'Show full history'
+      'Ask for contact name',
+      'Ask for email',
+      'Search GC for contact',
+      'Show full history: tags, emails, activity, purchases'
+    ]
+  },
+  {
+    name: '/sob',
+    category: 'contacts',
+    description: 'Look up user credentials in SaaSOnboard (access management)',
+    steps: [
+      'Ask for name and email',
+      'Ask what product they need',
+      'Search SOB API for email',
+      'Show access details if found',
+      '⚠️ Passwords NOT available via API (security)',
+      'Offer to reset password (with confirmation)'
+    ]
+  },
+  {
+    name: '/makelive',
+    category: 'system',
+    description: 'Deploy any project to Vercel with one command',
+    steps: [
+      'Commit & push to GitHub',
+      'Ensure Vercel project connected',
+      'Trigger Vercel deployment via API',
+      'Return live URL + confirm auto-deploy enabled'
     ]
   },
   {
     name: '/systemhealth',
     category: 'system',
-    description: 'Run health check on all APIs',
+    description: 'Run health check on all APIs and properties',
     steps: [
-      'Check 5 APIs',
-      'Check 9 URLs',
-      'Save results',
-      'Report failures'
+      'Check 5 APIs: GC, PopLinks/MintBird, Course Sprout, Letterman, SOB',
+      'Check 9 URLs: Key properties',
+      'Save results to health-checks/YYYY-MM-DD.json',
+      'Report any failures',
+      '⏰ Runs automatically: 10 AM & 4 PM CST'
     ]
   },
   {
     name: '/teamcall',
     category: 'system',
-    description: 'Extract assignments from Zoom',
+    description: 'Extract assignments from team Zoom call and update dashboard',
     steps: [
-      'Fetch latest recording',
-      'Parse transcript',
-      'Extract assignments',
-      'Update TEAM-KANBAN.md'
+      'Fetch latest recording (Meeting ID: 82250425529)',
+      'Download and parse transcript',
+      'Extract assignments per team member',
+      'Update TEAM-KANBAN.md',
+      'Post summary to Telegram team room'
     ]
   }
 ];
 
 const categoryColors: Record<string, string> = {
+  business: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
   email: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   content: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
   links: 'bg-green-500/20 text-green-400 border-green-500/30',
@@ -149,6 +233,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const categoryLabels: Record<string, string> = {
+  business: '🚀 Business',
   email: '📧 Email',
   content: '🎓 Content',
   links: '🔗 Links & Pages',
@@ -192,7 +277,7 @@ export default function CommandsPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
             {Object.entries(categoryLabels).map(([key, label]) => {
               const count = commands.filter(c => c.category === key).length;
               return (
@@ -288,7 +373,7 @@ export default function CommandsPage() {
 
         {/* Footer */}
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          <p>Last updated: February 18, 2026</p>
+          <p>Last updated: March 1, 2026</p>
           <p className="mt-2">Need a new command? Tell Chad and I'll build it.</p>
         </div>
       </div>
