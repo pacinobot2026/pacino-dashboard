@@ -18,7 +18,6 @@ const commands: Command[] = [
     name: '/create business',
     category: 'business',
     group: 'resources',
-    group: 'resources',
     description: 'PRODUCT CREATION ENGINE — Full 6-stage revenue mode from idea to scale',
     steps: [
       'STAGE 1: Generate 10 opportunities with scoring',
