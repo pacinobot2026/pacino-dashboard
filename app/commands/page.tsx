@@ -82,7 +82,8 @@ const commands: Command[] = [
       'Create lesson with short + long descriptions (NO EMOJIS)',
       'Add goal block (10 pts, comments, user input)',
       'Defaults: Course 340, Chapter 958'
-    ]
+    ],
+    logo: '/logos/coursesprout.png'
   },
   {
     name: '/article',
@@ -98,7 +99,8 @@ const commands: Command[] = [
       'Create as DRAFT with proper formatting',
       'Update SEO settings',
       '⚠️ WAIT for "publish" — never auto-publish'
-    ]
+    ],
+    logo: '/logos/letterman.png'
   },
   {
     name: '/poplink',
@@ -354,7 +356,10 @@ export default function CommandsPage() {
                         className="w-5 h-5"
                       />
                       <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                        {cmd.logo.includes('globalcontrol') ? 'Global Control' : 'MintBird'}
+                        {cmd.logo.includes('globalcontrol') ? 'Global Control' : 
+                         cmd.logo.includes('mintbird') ? 'MintBird' : 
+                         cmd.logo.includes('coursesprout') ? 'Course Sprout' : 
+                         cmd.logo.includes('letterman') ? 'Letterman' : ''}
                       </div>
                     </div>
                   )}
