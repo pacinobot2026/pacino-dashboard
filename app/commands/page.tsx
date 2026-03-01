@@ -29,6 +29,54 @@ const commands: Command[] = [
     shortcut: 'Type "/create business" to start full product creation'
   },
   {
+    name: '/salespage',
+    category: 'business',
+    description: 'Build professional Next.js sales page and deploy to Vercel',
+    steps: [
+      'Ask for product name and offer details',
+      'Generate sales page structure',
+      'Create with headline, video embed, bullet points, CTA',
+      'Deploy to Vercel',
+      'Return live URL'
+    ]
+  },
+  {
+    name: '/salescopy',
+    category: 'business',
+    description: 'Generate high-converting sales copy using proven frameworks',
+    steps: [
+      'Ask about product/offer',
+      'Choose framework (PAS, AIDA, etc.)',
+      'Generate headline, subheadline, bullets',
+      'Create CTA and urgency elements',
+      'Deliver formatted copy'
+    ]
+  },
+  {
+    name: '/vsl',
+    category: 'business',
+    description: 'Create complete VSL - script, audio, and video with text slides',
+    steps: [
+      'Generate VSL script (pattern interrupt → problem → solution → offer)',
+      'Create audio with ElevenLabs (Chad\'s voice)',
+      'Generate word-level timestamps with Whisper',
+      'Build text slides synced to audio',
+      'Compile final video with FFmpeg',
+      'Upload to Vimeo or return file'
+    ]
+  },
+  {
+    name: '/videoavatar',
+    category: 'business',
+    description: 'Generate AI avatar video with HeyGen or ElevenLabs',
+    steps: [
+      'Ask for script/message',
+      'Choose avatar style',
+      'Generate with HeyGen or ElevenLabs',
+      'Return video URL or file'
+    ]
+  },
+  {
     name: '/broadcast',
     category: 'email',
     description: 'Create and send broadcast email via Global Control',
