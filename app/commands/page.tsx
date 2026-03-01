@@ -15,6 +15,28 @@ interface Command {
 
 const commands: Command[] = [
   {
+    name: '/idea',
+    category: 'content',
+    group: 'resources',
+    description: 'Add idea to Idea Board with suggested category',
+    steps: [
+      'Ask what the idea is',
+      'Suggest the category',
+      'Create idea in board'
+    ]
+  },
+  {
+    name: '/resource',
+    category: 'content',
+    group: 'resources',
+    description: 'Add resource to Resource Library with suggested category',
+    steps: [
+      'Ask what the resource is',
+      'Suggest the category',
+      'Create resource in library'
+    ]
+  },
+  {
     name: '/create business',
     category: 'business',
     group: 'resources',
