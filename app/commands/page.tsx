@@ -251,6 +251,24 @@ const commands: Command[] = [
     logo: '/logos/globalcontrol.png'
   },
   {
+    name: '/workflow',
+    category: 'contacts',
+    group: 'titanium',
+    description: 'Create automated workflow in Global Control (email sequences, automations)',
+    steps: [
+      'Ask what the workflow should do',
+      'Define triggers and actions',
+      'Use safe pattern (Kafi-approved):',
+      '  1. POST /workflows (create empty container)',
+      '  2. GET /workflows/{id} (get current state)',
+      '  3. Add flows to existing array',
+      '  4. PUT /workflows/{id} (save complete array)',
+      '⚠️ Critical: PUT APPENDS flows - always get current state first',
+      'Return workflow ID and confirmation'
+    ],
+    logo: '/logos/globalcontrol.png'
+  },
+  {
     name: '/sob',
     category: 'contacts',
     group: 'external',
