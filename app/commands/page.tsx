@@ -6,6 +6,7 @@ import { NavigationSidebar } from '../components/NavigationSidebar';
 interface Command {
   name: string;
   category: 'business' | 'email' | 'content' | 'links' | 'contacts' | 'system';
+  group: 'titanium' | 'resources' | 'external';
   description: string;
   steps: string[];
   shortcut?: string;
@@ -16,6 +17,8 @@ const commands: Command[] = [
   {
     name: '/create business',
     category: 'business',
+    group: 'resources',
+    group: 'resources',
     description: 'PRODUCT CREATION ENGINE — Full 6-stage revenue mode from idea to scale',
     steps: [
       'STAGE 1: Generate 10 opportunities with scoring',
@@ -31,6 +34,7 @@ const commands: Command[] = [
   {
     name: '/salespage',
     category: 'business',
+    group: 'resources',
     description: 'Build professional Next.js sales page and deploy to Vercel',
     steps: [
       'Ask for product name and offer details',
@@ -43,6 +47,7 @@ const commands: Command[] = [
   {
     name: '/salescopy',
     category: 'business',
+    group: 'resources',
     description: 'Generate high-converting sales copy using proven frameworks',
     steps: [
       'Ask about product/offer',
@@ -55,6 +60,7 @@ const commands: Command[] = [
   {
     name: '/vsl',
     category: 'business',
+    group: 'resources',
     description: 'Create complete VSL - script, audio, and video with text slides',
     steps: [
       'Generate VSL script (pattern interrupt → problem → solution → offer)',
@@ -68,6 +74,7 @@ const commands: Command[] = [
   {
     name: '/videoavatar',
     category: 'business',
+    group: 'resources',
     description: 'Generate AI avatar video with HeyGen or ElevenLabs',
     steps: [
       'Ask for script/message',
@@ -79,6 +86,7 @@ const commands: Command[] = [
   {
     name: '/broadcast',
     category: 'email',
+    group: 'titanium',
     description: 'Create and send broadcast email via Global Control',
     steps: [
       'Ask what email is about',
@@ -94,6 +102,7 @@ const commands: Command[] = [
   {
     name: '/emailstats',
     category: 'email',
+    group: 'titanium',
     description: 'Get email performance stats from Global Control',
     steps: [
       'Ask: Broadcast or Workflow?',
@@ -106,6 +115,7 @@ const commands: Command[] = [
   {
     name: '/reactivation',
     category: 'email',
+    group: 'titanium',
     description: 'Long-term progressive campaign from CSV file (not instant broadcast)',
     steps: [
       'Ask how many contacts',
@@ -122,6 +132,7 @@ const commands: Command[] = [
   {
     name: '/replay',
     category: 'content',
+    group: 'titanium',
     description: 'Create Course Sprout lesson from Vimeo video',
     steps: [
       'Ask for Vimeo URL',
@@ -136,6 +147,7 @@ const commands: Command[] = [
   {
     name: '/article',
     category: 'content',
+    group: 'titanium',
     description: 'Create Letterman article with full workflow',
     steps: [
       'Ask: Blank or AI-generated?',
@@ -153,6 +165,7 @@ const commands: Command[] = [
   {
     name: '/poplink',
     category: 'links',
+    group: 'titanium',
     description: 'Create shortened PopLink (auto-generates slug + domain)',
     steps: [
       'User gives destination URL ONLY',
@@ -167,6 +180,7 @@ const commands: Command[] = [
   {
     name: '/leadstep',
     category: 'links',
+    group: 'titanium',
     description: 'Create lead capture page in PopLinks',
     steps: [
       'Ask for page name',
@@ -181,6 +195,7 @@ const commands: Command[] = [
   {
     name: '/bridgepage',
     category: 'links',
+    group: 'titanium',
     description: 'Create or clone bridge page in PopLinks',
     steps: [
       'Ask: Clone existing or create new?',
@@ -196,6 +211,7 @@ const commands: Command[] = [
   {
     name: '/tag',
     category: 'contacts',
+    group: 'titanium',
     description: 'Fire a tag on a contact in Global Control',
     steps: [
       'Ask for contact name',
@@ -209,6 +225,7 @@ const commands: Command[] = [
   {
     name: '/bulkimport',
     category: 'contacts',
+    group: 'titanium',
     description: 'Bulk import contacts from CSV and tag them (creates if needed)',
     steps: [
       'Ask for CSV file',
@@ -224,6 +241,7 @@ const commands: Command[] = [
   {
     name: '/contact',
     category: 'contacts',
+    group: 'titanium',
     description: 'Get contact history from Global Control',
     steps: [
       'Ask for contact name',
@@ -236,6 +254,7 @@ const commands: Command[] = [
   {
     name: '/sob',
     category: 'contacts',
+    group: 'external',
     description: 'Look up user credentials in SaaSOnboard (access management)',
     steps: [
       'Ask for name and email',
@@ -249,6 +268,7 @@ const commands: Command[] = [
   {
     name: '/makelive',
     category: 'system',
+    group: 'external',
     description: 'Deploy any project to Vercel with one command',
     steps: [
       'Commit & push to GitHub',
@@ -260,6 +280,7 @@ const commands: Command[] = [
   {
     name: '/systemhealth',
     category: 'system',
+    group: 'external',
     description: 'Run health check on all APIs and properties',
     steps: [
       'Check 5 APIs: GC, PopLinks/MintBird, Course Sprout, Letterman, SOB',
@@ -272,6 +293,7 @@ const commands: Command[] = [
   {
     name: '/teamcall',
     category: 'system',
+    group: 'external',
     description: 'Extract assignments from team Zoom call and update dashboard',
     steps: [
       'Fetch latest recording (Meeting ID: 82250425529)',
@@ -301,19 +323,25 @@ const categoryLabels: Record<string, string> = {
   system: '⚙️ System'
 };
 
+const groupLabels: Record<string, string> = {
+  titanium: '⚡ Titanium',
+  resources: '📚 Resources',
+  external: '🔌 External Software'
+};
+
 export default function CommandsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCommand, setExpandedCommand] = useState<string | null>(null);
 
   const filteredCommands = commands.filter(cmd => {
-    const matchesCategory = selectedCategory === 'all' || cmd.category === selectedCategory;
+    const matchesGroup = selectedGroup === 'all' || cmd.group === selectedGroup;
     const matchesSearch = cmd.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          cmd.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesGroup && matchesSearch;
   });
 
-  const categories = ['all', ...Array.from(new Set(commands.map(c => c.category)))];
+  const groups = ['all', ...Array.from(new Set(commands.map(c => c.group)))];
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
@@ -337,9 +365,9 @@ export default function CommandsPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-            {Object.entries(categoryLabels).map(([key, label]) => {
-              const count = commands.filter(c => c.category === key).length;
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {Object.entries(groupLabels).map(([key, label]) => {
+              const count = commands.filter(c => c.group === key).length;
               return (
                 <div key={key} className="bg-gray-900/50 border border-gray-800 rounded-lg p-3">
                   <div className="text-2xl font-bold">{count}</div>
@@ -363,17 +391,17 @@ export default function CommandsPage() {
               className="flex-1 px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg focus:border-blue-500 focus:outline-none"
             />
             <div className="flex gap-2 flex-wrap">
-              {categories.map(cat => (
+              {groups.map(grp => (
                 <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  key={grp}
+                  onClick={() => setSelectedGroup(grp)}
                   className={`px-4 py-2 rounded-lg text-sm transition-all ${
-                    selectedCategory === cat 
+                    selectedGroup === grp 
                       ? 'bg-blue-600 text-white' 
                       : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
                   }`}
                 >
-                  {cat === 'all' ? 'All' : categoryLabels[cat]}
+                  {grp === 'all' ? 'All' : groupLabels[grp]}
                 </button>
               ))}
             </div>
