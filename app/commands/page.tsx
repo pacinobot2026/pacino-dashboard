@@ -340,7 +340,7 @@ export default function CommandsPage() {
     return matchesGroup && matchesSearch;
   });
 
-  const groups = ['all', ...Array.from(new Set(commands.map(c => c.group)))];
+  const groups = ['all', 'titanium', 'resources', 'external'];
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black">
