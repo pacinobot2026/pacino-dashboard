@@ -347,11 +347,16 @@ export default function CommandsPage() {
                   <p className="text-gray-300 text-sm mb-3">{cmd.description}</p>
                   
                   {cmd.logo && (
-                    <img 
-                      src={cmd.logo} 
-                      alt="" 
-                      className="absolute bottom-4 right-4 w-8 h-8"
-                    />
+                    <div className="absolute bottom-4 right-4 group">
+                      <img 
+                        src={cmd.logo} 
+                        alt="" 
+                        className="w-5 h-5"
+                      />
+                      <div className="absolute bottom-full right-0 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                        {cmd.logo.includes('globalcontrol') ? 'Global Control' : 'MintBird'}
+                      </div>
+                    </div>
                   )}
                   
                   {cmd.shortcut && (
